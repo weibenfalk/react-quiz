@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
 import { fetchQuizQuestions } from './API';
-import { getShuffledAnswers } from './utils';
 // Components
 import QuestionCard from './components/QuestionCard';
-
-export type Question = {
-  category: string;
-  correct_answer: string;
-  difficulty: string;
-  incorrect_answers: string[];
-  question: string;
-  type: string;
-};
+// types
+import { QuestionsState, Difficulty } from './API';
 
 type AnswerObject = {
   question: string;
@@ -22,18 +14,16 @@ type AnswerObject = {
 
 const TOTAL_QUESTIONS = 10;
 
-function App() {
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentAnswers, setCurrentAnswers] = useState<string[]>([]);
+const App:React.FC = () => {
+  const [questions, setQuestions] = useState<QuestionsState[]>([]);
   const [number, setNumber] = useState(0);
   const [userAnswers, setUserAnswers] = useState<AnswerObject[]>([]);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(true);
 
   const startTrivia = async () => {
-    const newQuestions = await fetchQuizQuestions(TOTAL_QUESTIONS);
-    setQuestions(newQuestions.results);
-    setCurrentAnswers(getShuffledAnswers(newQuestions.results[number]));
+    const newQuestions = await fetchQuizQuestions(TOTAL_QUESTIONS, Difficulty.EASY);
+    setQuestions(newQuestions);
     setGameOver(false);
     setScore(0);
     setUserAnswers([]);
@@ -66,8 +56,7 @@ function App() {
     if (nextQ === TOTAL_QUESTIONS) {
       setGameOver(true);
     } else {
-      setCurrentAnswers(getShuffledAnswers(questions[nextQ]));
-      setNumber((prev) => prev + 1);
+      setNumber(nextQ);
     }
   };
 
@@ -75,15 +64,18 @@ function App() {
     <div className='App'>
       <button onClick={startTrivia}>Start</button>
       <div>Score: {score}</div>
+      <div>Question {number + 1} / {TOTAL_QUESTIONS}</div>
       {questions.length !== 0 && (
         <QuestionCard
           question={questions[number].question}
-          answers={currentAnswers}
+          answers={questions[number].answers}
           userAnswer={userAnswers ? userAnswers[number] : undefined}
           callback={checkAnswer}
         />
       )}
-      {!gameOver && userAnswers[number] ? <button onClick={nextQuestion}>Next Question</button> : null}
+      {!gameOver && userAnswers[number] ? (
+        <button onClick={nextQuestion}>Next Question</button>
+      ) : null}
     </div>
   );
 }
