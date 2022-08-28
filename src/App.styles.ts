@@ -1,5 +1,4 @@
-import styled, { createGlobalStyle } from 'styled-components';
-import BGImage from './images/nattu-adnan-unsplash.jpg';
+import styled, { createGlobalStyle } from "styled-components";
 
 export const GlobalStyle = createGlobalStyle`
   html {
@@ -7,7 +6,7 @@ export const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    background-image: url(${BGImage});
+    background-image: url(${require("./images/nattu-adnan-unsplash.jpg")});
     background-size: cover;
     margin: 0;
     padding: 0 20px;
